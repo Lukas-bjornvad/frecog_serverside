@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask-restplus = "*"
+gunicorn = "*"
+configparser = "*"
+sqlalchemy = "*"
+nose2 = "*"
+flask = "*"
+pymysql = "*"
+distro = "*"
+importlib-metadata = "*"
+flask-cors = "*"
+
+[requires]
+python_version = "3.6.9"
