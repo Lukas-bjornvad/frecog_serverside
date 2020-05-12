@@ -10,8 +10,6 @@ def DB_connection():
     active_environment = get_active_environment()
     conf = configparser.ConfigParser()
     conf.read("./settings/sensitive.ini")
-    print(conf[active_environment]["SQLUsername"])
-    print(conf[active_environment]["SQLPassword"])
     # This is for remote access. It's not required in this assignment, but I'm keeping it for future reference
     # if active_environment == "PRODUCTION":
     #    production_ssh_setup(active_environment, conf)

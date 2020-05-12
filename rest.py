@@ -2,10 +2,12 @@ import werkzeug
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 werkzeug.cached_property = werkzeug.utils.cached_property
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_restplus import Api, Resource, cors
 from connection.connector import construct_con_str
 import configparser
+import os
+from settings.pathing import os_parse_path
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = construct_con_str()
@@ -17,6 +19,12 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 api = Api(app)
 ns = api.namespace("rest", description="Assignment Rest")
+
+# Temporary. Change under configuration
+directory =  os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "images")
+    )
+print(directory)
 
 
 @ns.route("/")
@@ -33,4 +41,9 @@ class ResToFrom(Resource):
     def post(self):
         return None, 201
 
-
+@ns.route('/<string:filename>')
+@api.response(404, 'Nothing here but us lemmings')
+class ResImg(Resource):
+    @cors.crossdomain(origin='*')
+    def get(self, filename):
+        return send_from_directory(directory,filename)
