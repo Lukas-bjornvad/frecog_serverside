@@ -41,9 +41,9 @@ class ResToFrom(Resource):
     def post(self):
         return None, 201
 
-@ns.route('/<string:filename>')
+@ns.route('/<string:subject>/<string:filename>')
 @api.response(404, 'Nothing here but us lemmings')
 class ResImg(Resource):
     @cors.crossdomain(origin='*')
-    def get(self, filename):
-        return send_from_directory(directory,filename)
+    def get(self, subject, filename):
+        return send_from_directory(f'{directory}{subject}',filename)
