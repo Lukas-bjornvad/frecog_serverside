@@ -17,6 +17,7 @@ distro = "*"
 importlib-metadata = "*"
 flask-cors = "*"
 flask-sqlalchemy = "*"
+pathlib = "*"
 
 [requires]
 python_version = "3.7"
