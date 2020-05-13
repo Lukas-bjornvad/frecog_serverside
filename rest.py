@@ -1,13 +1,17 @@
 import werkzeug
+from werkzeug.datastructures import FileStorage
 from werkzeug.middleware.proxy_fix import ProxyFix
-
 werkzeug.cached_property = werkzeug.utils.cached_property
-from flask import Flask, send_from_directory
+
+from flask import Flask, send_from_directory, jsonify
 from flask_restplus import Api, Resource, cors
-from connection.connector import construct_con_str
 import configparser
 import os
-from settings.pathing import os_parse_path
+from pathlib import Path
+
+from connection.connector import construct_con_str
+from entities.image import Image
+from entities.subject import Subject
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = construct_con_str()
@@ -17,15 +21,19 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-api = Api(app)
+api = Api(app, version='0.0.1', title='frecog project API', description='exam project')
+upload_parser = api.parser()
+upload_parser.add_argument('file', location='files',type=FileStorage, required=True)
+
 ns = api.namespace("rest", description="Assignment Rest")
+
 
 # Temporary. Change under configuration
 directory =  os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "images")
     )
-print(directory)
 
+#api.abort(errorcode, message)
 
 @ns.route("/")
 @api.response(404, "Nothing here but us lemmings")
@@ -64,7 +72,7 @@ class ResImgReveal(Resource):
             Image file -- [flask send from directory]
             [Integer] - [status code 200]
         """        
-        return send_from_directory(f'{directory}{subject}',filename), 200
+        return send_from_directory(f'{directory}{subject}',filename, as_attachment=True), 200
 
 @ns.route('/img/dl/<string:first_name>%<string:last_name>/all')
 @api.response(404, 'Nothing here but us lemmings')
@@ -136,8 +144,9 @@ class ResImgInform(Resource):
         raise NotImplementedError
         return 'Not yet implemented', 200
 
-@ns.route('/img/<string:first_name>%<string:last_name>%img=<string:file_name>')
+@ns.route('/img/<string:first_name>%<string:last_name>')
 @api.response(404, 'Nothing here but us lemmings')
+@api.expect(upload_parser)
 class ResImgUpload(Resource):
     @cors.crossdomain(origin='*')
     def post(self, first_name, last_name, file_name):
@@ -146,10 +155,16 @@ class ResImgUpload(Resource):
         Arguments:
             first_name {String} -- [subject first name]
             last_name {string} -- [subject last name]
-            file_name {string} -- [desired file name]
 
         Returns:
             [string] -- [code 204 if succesful]
         """
+        # To do:
+        # Check if person with name exists.
+        # If not create path in repository
+        # Upload file
+
+        uploaded_img = args['file']
+
         raise NotImplementedError
         return 204
